@@ -5,7 +5,26 @@ type Task = {
     state: boolean,
 }
 
-const tasks: Task[] = []
+let tasks: Task[] = []
+
+const fs = require('fs')
+const fileName = './tasks.json'
+
+
+// 同期的にファイルから復元
+try {
+    const data = fs.readFileSync(fileName, 'utf8')
+    tasks = JSON.parse(data)
+} catch (ignore) {
+    console.log(fileName + 'から復元できませんでした')
+}
+
+/**
+ * タスクをファイルに保存する
+ */
+const saveTasks = () => {
+    fs.writeFileSync(fileName, JSON.stringify(tasks), 'utf8')
+}
 
 /**
  * TODO を追加する
@@ -13,6 +32,7 @@ const tasks: Task[] = []
  */
 const add = (taskName: string) => {
     tasks.push({ name: taskName, state: false })
+    saveTasks()
 }
 
 /**
@@ -51,6 +71,7 @@ const done = (taskName: string) => {
     const indexFound: number = tasks.findIndex(task => task.name === taskName)
     if (indexFound !== -1) {
         tasks[indexFound].state = true
+        saveTasks()
     }
 }
 
@@ -70,6 +91,7 @@ const del = (taskName: string) => {
     const indexFound: number = tasks.findIndex(task => task.name === taskName)
     if (indexFound !== -1) {
         tasks.splice(indexFound, 1)
+        saveTasks()
     }
 }
 
