@@ -1,0 +1,11 @@
+{
+  "name": "node-js-http2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {"dev": "node ./dist/index.js"},
+  "devDependencies": {
+    "@types/node": "10",
+    "typescript": "^4.1.3"
+  }
+}
