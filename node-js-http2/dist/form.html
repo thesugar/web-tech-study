@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アンケート</title>
+    <style>
+        input[type=text] {
+            display: block;
+        }
+
+        button {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>どれが食べたい？</h1>
+    <form action="/enquetes/pasta" method="post">
+        名前: <input type="text" name="name">
+        <!-- name が key, value が value になる -->
+        <input type="radio" name="pasta" value="カルボナーラ">カルボナーラ
+        <input type="radio" name="pasta" value="カチョエペペ">カチョエペペ
+        <button type="submit">投稿</button>
+    </form>
+    
+</body>
+</html>
