@@ -4,8 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
-const fs_1 = __importDefault(require("fs"));
 const querystring_1 = __importDefault(require("querystring"));
+const pug_1 = __importDefault(require("pug"));
 const server = http_1.default.createServer((req, res) => {
     const now = new Date();
     console.info(`[${now}] Requested by ${req.connection.remoteAddress}`);
@@ -14,11 +14,13 @@ const server = http_1.default.createServer((req, res) => {
     });
     switch (req.method) {
         case 'GET':
-            // GET のときに `./form.html` の内容を送る
-            // fs モジュールの createReadStream でファイルの読み込みストリームを作成したあと、レスポンスのオブジェクト res に対して pipe 関数でパイプしている。
-            // Node.js では Stream 形式のデータは、読み込み用の Stream と書き込み用の Stream を繋いでそのままデータを受け渡すことができます。 それが pipe という関数の機能である。
-            const rs = fs_1.default.createReadStream('./dist/form.html');
-            rs.pipe(res); // pipe 関数を使った場合は res.end() を呼ぶ必要がない
+            const [firstItem, secondItem] = req.url === '/enquetes/pasta' ? ['カチョエペペ', 'カルボナーラ'] : req.url === '/enquetes/cheese' ? ['パルミジャーノ・レッジャーノ', 'ペコリーノ・ロマーノ'] : [];
+            res.write(pug_1.default.renderFile('./dist/form.pug', {
+                path: req.url,
+                firstItem,
+                secondItem,
+            }));
+            res.end();
             break;
         case 'POST':
             let rawData = '';
@@ -30,7 +32,7 @@ const server = http_1.default.createServer((req, res) => {
                 const decoded = decodeURIComponent(rawData);
                 const parsed = querystring_1.default.parse(decoded);
                 console.info(`[${now}] 投稿: ${decoded}`);
-                res.write(`<!DOCTYPE html><html lang="ja"><body><h1>${parsed.name} さんは ${parsed.pasta} に投票しました</h1></body></html>`);
+                res.write(`<!DOCTYPE html><html lang="ja"><body><h1>${parsed.name} さんは ${parsed.favorite} に投票しました</h1></body></html>`);
                 res.end();
             });
             break;
