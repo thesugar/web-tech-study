@@ -7,11 +7,13 @@
     "dev": "node ./dist/index.js"
   },
   "devDependencies": {
+    "@types/http-auth": "^4.1.0",
     "@types/node": "10",
     "@types/pug": "^2.0.4",
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "http-auth": "^4.1.2",
     "pug": "2.0.4"
   }
 }

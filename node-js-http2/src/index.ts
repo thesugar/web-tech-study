@@ -3,8 +3,18 @@
 import http from 'http'
 import qs from 'querystring'
 import pug from 'pug'
+import auth from 'http-auth'
+import {ServerOptions} from 'https'
 
-const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+// TypeScript だと（少なくとも http-auth を使った）Basic 認証ができないっぽい？
+// http.createServer の第一引数に basic を渡しても Basic 認証が機能しない。
+const basic = auth.basic(
+    { realm: 'Enquetes Area.' },
+    (username, password, callback) => {
+        callback(username === 'guest' && password === 'abcdef')
+    }
+)
+const server = http.createServer((basic as ServerOptions), (req: http.IncomingMessage, res: http.ServerResponse) => {
     const now = new Date()
     console.info(`[${now}] Requested by ${req.connection.remoteAddress}`)
     res.writeHead(200, {

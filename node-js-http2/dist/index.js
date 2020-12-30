@@ -6,7 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = __importDefault(require("http"));
 const querystring_1 = __importDefault(require("querystring"));
 const pug_1 = __importDefault(require("pug"));
-const server = http_1.default.createServer((req, res) => {
+const http_auth_1 = __importDefault(require("http-auth"));
+// http.createServer の第一引数に渡すためには Basic 型だとコンパイルが通らない
+const basic = http_auth_1.default.basic({ realm: 'Enquetes Area.' }, (username, password, callback) => {
+    callback(username === 'guest' && password === 'abcdef');
+});
+const server = http_1.default.createServer(basic, (req, res) => {
     const now = new Date();
     console.info(`[${now}] Requested by ${req.connection.remoteAddress}`);
     res.writeHead(200, {
