@@ -1,0 +1,17 @@
+{
+  "name": "secret-board2",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "10",
+    "@types/pug": "^2.0.4",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "pug": "2.0.4"
+  }
+}
