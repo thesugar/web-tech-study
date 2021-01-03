@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const pug_1 = __importDefault(require("pug"));
+const handler_util_1 = require("./handler-util");
 const contents = [];
 const handle = (req, res) => {
     switch (req.method) {
@@ -11,7 +12,7 @@ const handle = (req, res) => {
             res.writeHead(200, {
                 'Content-Type': 'text/html; charset=utf-8'
             });
-            res.end(pug_1.default.renderFile('./views/posts.pug'));
+            res.end(pug_1.default.renderFile('./views/posts.pug', { contents }));
             break;
         case 'POST':
             let body = [];
@@ -30,6 +31,7 @@ const handle = (req, res) => {
             });
             break;
         default:
+            handler_util_1.handleBadRequest(req, res);
             break;
     }
 };

@@ -1,6 +1,7 @@
 'use strict'
 import postsHandler from './posts-handler'
 import http from 'http'
+import {handleLogout, handleNotFound} from './handler-util'
 
 const route = (req: http.IncomingMessage, res: http.ServerResponse) => {
     switch (req.url) {
@@ -9,10 +10,11 @@ const route = (req: http.IncomingMessage, res: http.ServerResponse) => {
             break
 
         case '/logout':
-            // TODO: ログアウト処理
+            handleLogout(req, res)
             break
     
         default:
+            handleNotFound(req, res)
             break
     }
 }

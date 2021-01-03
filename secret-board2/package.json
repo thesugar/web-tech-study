@@ -7,11 +7,13 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@types/http-auth": "^4.1.0",
     "@types/node": "10",
     "@types/pug": "^2.0.4",
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "http-auth": "3.2.3",
     "pug": "2.0.4"
   }
 }

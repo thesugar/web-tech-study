@@ -2,6 +2,7 @@
 
 import http from 'http'
 import pug from 'pug'
+import { handleBadRequest } from './handler-util'
 
 const contents: string[] = []
 
@@ -11,7 +12,7 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
             res.writeHead(200, {
                 'Content-Type': 'text/html; charset=utf-8'
             })
-            res.end(pug.renderFile('./views/posts.pug'))
+            res.end(pug.renderFile('./views/posts.pug', { contents }))
             break
     
         case 'POST':
@@ -32,6 +33,7 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
             break
 
         default:
+            handleBadRequest(req, res)
             break
     }
 }
