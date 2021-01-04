@@ -4,6 +4,8 @@ import http from 'http'
 import pug from 'pug'
 import { handleBadRequest } from './handler-util'
 
+const Post = require('./post')
+
 const contents: string[] = []
 
 const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
@@ -28,7 +30,13 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
                 console.info(`投稿されました: ${content}`)
                 contents.push(content)
                 console.info(`投稿された全内容: ${contents}`)
-                handleRedirectPosts(req, res)
+                Post.create({
+                    content,
+                    trackingCookie: null,
+                    postedBy: 'testuser',
+                }).then(() => {
+                    handleRedirectPosts(req, res)
+                })
             })
             break
 
