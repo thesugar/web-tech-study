@@ -4,9 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const pug_1 = __importDefault(require("pug"));
+const cookies_1 = __importDefault(require("cookies"));
 const handler_util_1 = require("./handler-util");
 const post_1 = __importDefault(require("./post"));
+const trackingIdKey = 'tracking_id';
 const handle = (req, res) => {
+    const cookies = new cookies_1.default(req, res);
+    addTrackingCookie(cookies);
     switch (req.method) {
         case 'GET':
             res.writeHead(200, {
@@ -16,6 +20,10 @@ const handle = (req, res) => {
             post_1.default.findAll({ order: [['id', 'DESC']] }).then((posts) => {
                 res.end(pug_1.default.renderFile('./views/posts.pug', { posts }));
             });
+            console.info(`閲覧されました: user: ${req.user}\n` +
+                `trackigId: ${cookies.get(trackingIdKey)}\n` +
+                `remoteAddress: ${req.connection.remoteAddress}\n` +
+                `userAgent: ${req.headers['user-agent']}`);
             break;
         case 'POST':
             let body = [];
@@ -30,7 +38,7 @@ const handle = (req, res) => {
                 console.info(`投稿されました: ${content}`);
                 post_1.default.create({
                     content,
-                    trackingCookie: null,
+                    trackingCookie: cookies.get(trackingIdKey),
                     postedBy: req.user,
                 }).then(() => {
                     handleRedirectPosts(req, res);
@@ -40,6 +48,13 @@ const handle = (req, res) => {
         default:
             handler_util_1.handleBadRequest(req, res);
             break;
+    }
+};
+const addTrackingCookie = (cookies) => {
+    if (!cookies.get(trackingIdKey)) {
+        const trackingId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString();
+        const tomorrow = new Date(Date.now() + (1000 * 60 * 60 * 24));
+        cookies.set(trackingIdKey, trackingId, { expires: tomorrow });
     }
 };
 const handleRedirectPosts = (req, res) => {

@@ -2,8 +2,11 @@
 
 import http from 'http'
 import pug from 'pug'
+import Cookies from 'cookies'
 import { handleBadRequest } from './handler-util'
 import Post from './post'
+
+const trackingIdKey = 'tracking_id'
 
 type PostType = {
     id: string,
@@ -15,6 +18,8 @@ type PostType = {
 }
 
 const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
+    const cookies = new Cookies(req, res)
+    addTrackingCookie(cookies)
     switch (req.method) {
         case 'GET':
             res.writeHead(200, {
@@ -24,6 +29,11 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
             Post.findAll({order: [['id', 'DESC']]}).then((posts: PostType) => {
                 res.end(pug.renderFile('./views/posts.pug', { posts }))
             })
+            console.info(`閲覧されました: user: ${req.user}\n` +
+            `trackigId: ${cookies.get(trackingIdKey)}\n` +
+            `remoteAddress: ${req.connection.remoteAddress}\n` +
+            `userAgent: ${req.headers['user-agent']}`
+            ) 
             break
     
         case 'POST':
@@ -39,7 +49,7 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
                 console.info(`投稿されました: ${content}`)
                 Post.create({
                     content,
-                    trackingCookie: null,
+                    trackingCookie: cookies.get(trackingIdKey),
                     postedBy: req.user,
                 }).then(() => {
                     handleRedirectPosts(req, res)
@@ -50,6 +60,14 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
         default:
             handleBadRequest(req, res)
             break
+    }
+}
+
+const addTrackingCookie = (cookies: Cookies) => {
+    if (!cookies.get(trackingIdKey)) {
+        const trackingId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString()
+        const tomorrow = new Date(Date.now() + (1000 * 60 * 60 * 24))
+        cookies.set(trackingIdKey, trackingId, { expires: tomorrow })
     }
 }
 
