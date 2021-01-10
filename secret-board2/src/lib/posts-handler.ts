@@ -5,7 +5,14 @@ import pug from 'pug'
 import { handleBadRequest } from './handler-util'
 import Post from './post'
 
-const contents: string[] = []
+type PostType = {
+    id: string,
+    content: string,
+    postedBy: string,
+    trackingCookie: string,
+    createdAt: string,
+    updatedAt: string,
+}
 
 const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
     switch (req.method) {
@@ -13,7 +20,10 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
             res.writeHead(200, {
                 'Content-Type': 'text/html; charset=utf-8'
             })
-            res.end(pug.renderFile('./views/posts.pug', { contents }))
+            // order: ['id', 'DESC'] 後で投稿されたものが先に表示される（ID の降順）
+            Post.findAll({order: [['id', 'DESC']]}).then((posts: PostType) => {
+                res.end(pug.renderFile('./views/posts.pug', { posts }))
+            })
             break
     
         case 'POST':
@@ -27,8 +37,6 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
                 // 以下の content は、フォーム（posts.pug）で自分で定義した name (key-value の key)
                 const content = decoded.split('content=')[1]
                 console.info(`投稿されました: ${content}`)
-                contents.push(content)
-                console.info(`投稿された全内容: ${contents}`)
                 Post.create({
                     content,
                     trackingCookie: null,

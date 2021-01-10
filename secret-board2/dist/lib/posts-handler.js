@@ -6,14 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const pug_1 = __importDefault(require("pug"));
 const handler_util_1 = require("./handler-util");
 const post_1 = __importDefault(require("./post"));
-const contents = [];
 const handle = (req, res) => {
     switch (req.method) {
         case 'GET':
             res.writeHead(200, {
                 'Content-Type': 'text/html; charset=utf-8'
             });
-            res.end(pug_1.default.renderFile('./views/posts.pug', { contents }));
+            // order: ['id', 'DESC'] 後で投稿されたものが先に表示される（ID の降順）
+            post_1.default.findAll({ order: [['id', 'DESC']] }).then((posts) => {
+                res.end(pug_1.default.renderFile('./views/posts.pug', { posts }));
+            });
             break;
         case 'POST':
             let body = [];
@@ -26,8 +28,6 @@ const handle = (req, res) => {
                 // 以下の content は、フォーム（posts.pug）で自分で定義した name (key-value の key)
                 const content = decoded.split('content=')[1];
                 console.info(`投稿されました: ${content}`);
-                contents.push(content);
-                console.info(`投稿された全内容: ${contents}`);
                 post_1.default.create({
                     content,
                     trackingCookie: null,
