@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const pug_1 = __importDefault(require("pug"));
 const handler_util_1 = require("./handler-util");
-const Post = require('./post');
+const post_1 = __importDefault(require("./post"));
 const contents = [];
 const handle = (req, res) => {
     switch (req.method) {
@@ -28,10 +28,10 @@ const handle = (req, res) => {
                 console.info(`投稿されました: ${content}`);
                 contents.push(content);
                 console.info(`投稿された全内容: ${contents}`);
-                Post.create({
+                post_1.default.create({
                     content,
                     trackingCookie: null,
-                    postedBy: 'testuser',
+                    postedBy: req.user,
                 }).then(() => {
                     handleRedirectPosts(req, res);
                 });

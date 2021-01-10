@@ -1,9 +1,9 @@
 'use strict'
 const Sequelize = require('sequelize')
 const sequelize = new Sequelize(
-  'postgres://postgres:postgres@localhost/secret_board',
+  'postgres://postgres:postgres@localhost/secret_board2',
   {
-    logging: false
+    logging: false // sequelize が出すログの設定をオフにする
   }
 )
 const Post = sequelize.define(
@@ -25,10 +25,10 @@ const Post = sequelize.define(
     }
   },
   {
-    freezeTableName: true,
-    timestamps: true
+    freezeTableName: true, // テーブル名を Post で固定する
+    timestamps: true, // createdAt と updateAt を自動的に追加
   }
 )
 
-Post.sync()
+Post.sync() // Post というオブジェクト自体を DB に適用して同期を取る
 module.exports = Post

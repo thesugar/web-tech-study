@@ -3,8 +3,7 @@
 import http from 'http'
 import pug from 'pug'
 import { handleBadRequest } from './handler-util'
-
-const Post = require('./post')
+import Post from './post'
 
 const contents: string[] = []
 
@@ -33,7 +32,7 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
                 Post.create({
                     content,
                     trackingCookie: null,
-                    postedBy: 'testuser',
+                    postedBy: req.user,
                 }).then(() => {
                     handleRedirectPosts(req, res)
                 })

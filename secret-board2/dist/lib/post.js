@@ -1,7 +1,7 @@
 'use strict';
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('postgres://postgres:postgres@localhost/secret_board', {
-    logging: false
+const sequelize = new Sequelize('postgres://postgres:postgres@localhost/secret_board2', {
+    logging: false // sequelize が出すログの設定をオフにする
 });
 const Post = sequelize.define('Post', {
     id: {
@@ -20,8 +20,8 @@ const Post = sequelize.define('Post', {
     }
 }, {
     freezeTableName: true,
-    timestamps: true
+    timestamps: true,
 });
-Post.sync();
+Post.sync(); // Post というオブジェクト自体を DB に適用して同期を取る
 module.exports = Post;
 //# sourceMappingURL=post.js.map
