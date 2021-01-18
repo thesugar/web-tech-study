@@ -27,7 +27,7 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
             })
             // order: ['id', 'DESC'] 後で投稿されたものが先に表示される（ID の降順）
             Post.findAll({order: [['id', 'DESC']]}).then((posts: PostType) => {
-                res.end(pug.renderFile('./views/posts.pug', { posts }))
+                res.end(pug.renderFile('./views/posts.pug', { posts, user: req.user }))
             })
             console.info(`閲覧されました: user: ${req.user}\n` +
             `trackigId: ${cookies.get(trackingIdKey)}\n` +
@@ -63,6 +63,34 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
     }
 }
 
+const handleDelete = (req: http.IncomingMessage, res: http.ServerResponse) => {
+    switch (req.method) {
+        case 'POST':
+            let body:any = []
+            req.on('data', (chunk) => {
+                body.push(chunk)
+            }).on('end', () => {
+                body = Buffer.concat(body)
+                const bodyString = body.toString()
+                const decoded = decodeURIComponent(bodyString)
+                const id = decoded.split('id=')[1] // 投稿の ID を取得
+                Post.findByPk(id).then((post: any) => {
+                    // 必ず、サーバーサイドにおいても、利用者が（削除）機能を利用する権限があるかを資格に応じて許可（認可）
+                    if (req.user === post.postedBy) {
+                        post.destroy().then(() => {
+                            console.info(`削除されました: user: ${req.user}, \nremoteAddress: ${req.connection.remoteAddress}, \nuserAgent: ${req.headers['user-agent']}`)
+                            handleRedirectPosts(req, res)
+                        })
+                    }
+                })
+            })
+            break;
+    
+        default:
+            break;
+    }
+}
+
 const addTrackingCookie = (cookies: Cookies) => {
     if (!cookies.get(trackingIdKey)) {
         const trackingId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString()
@@ -79,4 +107,4 @@ const handleRedirectPosts = (req: http.IncomingMessage, res: http.ServerResponse
     res.end()
 }
 
-export default { handle }
+export default { handle, handleDelete }

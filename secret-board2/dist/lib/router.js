@@ -10,6 +10,9 @@ const route = (req, res) => {
         case '/posts':
             posts_handler_1.default.handle(req, res);
             break;
+        case '/posts?delete=1':
+            posts_handler_1.default.handleDelete(req, res);
+            break;
         case '/logout':
             handler_util_1.handleLogout(req, res);
             break;

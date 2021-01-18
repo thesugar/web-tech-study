@@ -9,6 +9,10 @@ const route = (req: http.IncomingMessage, res: http.ServerResponse) => {
             postsHandler.handle(req, res)            
             break
 
+        case '/posts?delete=1':
+            postsHandler.handleDelete(req, res)
+            break
+            
         case '/logout':
             handleLogout(req, res)
             break

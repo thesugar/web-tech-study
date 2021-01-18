@@ -18,7 +18,7 @@ const handle = (req, res) => {
             });
             // order: ['id', 'DESC'] 後で投稿されたものが先に表示される（ID の降順）
             post_1.default.findAll({ order: [['id', 'DESC']] }).then((posts) => {
-                res.end(pug_1.default.renderFile('./views/posts.pug', { posts }));
+                res.end(pug_1.default.renderFile('./views/posts.pug', { posts, user: req.user }));
             });
             console.info(`閲覧されました: user: ${req.user}\n` +
                 `trackigId: ${cookies.get(trackingIdKey)}\n` +
@@ -50,6 +50,32 @@ const handle = (req, res) => {
             break;
     }
 };
+const handleDelete = (req, res) => {
+    switch (req.method) {
+        case 'POST':
+            let body = [];
+            req.on('data', (chunk) => {
+                body.push(chunk);
+            }).on('end', () => {
+                body = Buffer.concat(body);
+                const bodyString = body.toString();
+                const decoded = decodeURIComponent(bodyString);
+                const id = decoded.split('id=')[1]; // 投稿の ID を取得
+                post_1.default.findByPk(id).then((post) => {
+                    // 必ず、サーバーサイドにおいても、利用者が（削除）機能を利用する権限があるかを資格に応じて許可（認可）
+                    if (req.user === post.postedBy) {
+                        post.destroy().then(() => {
+                            console.info(`削除されました: user: ${req.user}, \nremoteAddress: ${req.connection.remoteAddress}, \nuserAgent: ${req.headers['user-agent']}`);
+                            handleRedirectPosts(req, res);
+                        });
+                    }
+                });
+            });
+            break;
+        default:
+            break;
+    }
+};
 const addTrackingCookie = (cookies) => {
     if (!cookies.get(trackingIdKey)) {
         const trackingId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER).toString();
@@ -64,5 +90,5 @@ const handleRedirectPosts = (req, res) => {
     });
     res.end();
 };
-exports.default = { handle };
+exports.default = { handle, handleDelete };
 //# sourceMappingURL=posts-handler.js.map
