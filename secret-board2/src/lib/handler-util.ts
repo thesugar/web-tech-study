@@ -4,9 +4,12 @@ import http from 'http'
 
 const handleLogout = (req: http.IncomingMessage, res: http.ServerResponse) => {
     res.writeHead(401, {
-        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Type': 'text/html; charset=utf-8',
     })
-    res.end('ログアウトしました')
+    res.end('<!DOCTYPE html><html lang="ja"><body>' +
+    '<h1>ログアウトしました</h1>' +
+    '<a href="/posts">ログイン</a>' +
+    '</body></html>')
 }
 
 const handleNotFound = (req: http.IncomingMessage, res: http.ServerResponse) => {

@@ -16,11 +16,19 @@ html(lang="ja")
 
         h2 投稿一覧
         each post in posts
-            h3 #{post.id} : ID: #{post.trackingCookie}
-            p #{post.content}
+            - var isPostedByAdmin = (post.postedBy === 'admin')
+            if isPostedByAdmin
+                h3 #{post.id} : 管理人 ★
+            else
+                h3 #{post.id} : ID: #{post.trackingCookie}
+            //- 以下の書き方（p!=）でタグを認識させる
+            p!= post.content
             p 投稿日時: #{post.createdAt}
+            - var isAdmin = (user === 'admin')
+            if isAdmin
+                p 投稿者: #{post.postedBy}
             //- 以下の行は pug のテンプレート内に JavaScript のコードを記述する方法
-            - var isDeletable = (user === post.postedBy)
+            - var isDeletable = (user === post.postedBy || user === 'admin')
             if isDeletable
                 form(method="post" action="/posts?delete=1")
                     input(type="hidden" name="id" value=post.id)

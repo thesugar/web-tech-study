@@ -18,6 +18,10 @@ const handle = (req, res) => {
             });
             // order: ['id', 'DESC'] 後で投稿されたものが先に表示される（ID の降順）
             post_1.default.findAll({ order: [['id', 'DESC']] }).then((posts) => {
+                posts.forEach(post => {
+                    // 改行を <br> タグに変換して、UI 上でも改行として表示されるようにする。
+                    post.content = post.content.replace(/\n/g, '<br>');
+                });
                 res.end(pug_1.default.renderFile('./views/posts.pug', { posts, user: req.user }));
             });
             console.info(`閲覧されました: user: ${req.user}\n` +
@@ -63,7 +67,7 @@ const handleDelete = (req, res) => {
                 const id = decoded.split('id=')[1]; // 投稿の ID を取得
                 post_1.default.findByPk(id).then((post) => {
                     // 必ず、サーバーサイドにおいても、利用者が（削除）機能を利用する権限があるかを資格に応じて許可（認可）
-                    if (req.user === post.postedBy) {
+                    if (req.user === post.postedBy || req.user === 'admin') {
                         post.destroy().then(() => {
                             console.info(`削除されました: user: ${req.user}, \nremoteAddress: ${req.connection.remoteAddress}, \nuserAgent: ${req.headers['user-agent']}`);
                             handleRedirectPosts(req, res);
