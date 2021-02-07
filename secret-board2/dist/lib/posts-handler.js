@@ -7,6 +7,7 @@ const pug_1 = __importDefault(require("pug"));
 const cookies_1 = __importDefault(require("cookies"));
 const handler_util_1 = require("./handler-util");
 const post_1 = __importDefault(require("./post"));
+const moment = require('moment-timezone'); // import でやると TS のエラーが出る
 const trackingIdKey = 'tracking_id';
 const handle = (req, res) => {
     const cookies = new cookies_1.default(req, res);
@@ -21,6 +22,7 @@ const handle = (req, res) => {
                 posts.forEach(post => {
                     // 改行を <br> タグに変換して、UI 上でも改行として表示されるようにする。
                     post.content = post.content.replace(/\n/g, '<br>');
+                    post.formattedCreatedAt = moment(post.createdAt).tz('Asia/Tokyo').format('YYYY年MM月DD日 HH時mm分ss秒');
                 });
                 res.end(pug_1.default.renderFile('./views/posts.pug', { posts, user: req.user }));
             });

@@ -6,6 +6,8 @@ import Cookies from 'cookies'
 import { handleBadRequest } from './handler-util'
 import Post from './post'
 
+const moment = require('moment-timezone') // import でやると TS のエラーが出る
+
 const trackingIdKey = 'tracking_id'
 
 type PostType = {
@@ -14,6 +16,7 @@ type PostType = {
     postedBy: string,
     trackingCookie: string,
     createdAt: string,
+    formattedCreatedAt: string,
     updatedAt: string,
 }
 
@@ -30,6 +33,7 @@ const handle = (req: http.IncomingMessage, res: http.ServerResponse) => {
                 posts.forEach(post => {
                     // 改行を <br> タグに変換して、UI 上でも改行として表示されるようにする。
                     post.content = post.content.replace(/\n/g, '<br>')
+                    post.formattedCreatedAt = moment(post.createdAt).tz('Asia/Tokyo').format('YYYY年MM月DD日 HH時mm分ss秒')
                 })
                 res.end(pug.renderFile('./views/posts.pug', { posts, user: req.user }))
             })

@@ -1,6 +1,7 @@
 'use strict'
 
 import http from 'http'
+import fs from 'fs'
 
 const handleLogout = (req: http.IncomingMessage, res: http.ServerResponse) => {
     res.writeHead(401, {
@@ -26,4 +27,12 @@ const handleBadRequest = (req: http.IncomingMessage, res: http.ServerResponse) =
     res.end('未対応のメソッドです')
 }
 
-export { handleLogout, handleNotFound, handleBadRequest }
+const handleFavicon = (req: http.IncomingMessage, res: http.ServerResponse) => {
+    res.writeHead(200, {
+        'Content-Type': 'image/vnd.microsoft.icon'  // favicon のコンテンツタイプ
+    })
+    const favicon = fs.readFileSync('./favicon.ico') // favicon のファイルを Stream として同期的に読み出し、それをレスポンスの内容として書き出している
+    res.end(favicon)
+}
+
+export { handleLogout, handleNotFound, handleBadRequest, handleFavicon }

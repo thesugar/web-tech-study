@@ -16,6 +16,9 @@ const route = (req, res) => {
         case '/logout':
             handler_util_1.handleLogout(req, res);
             break;
+        case '/favicon.ico':
+            handler_util_1.handleFavicon(req, res);
+            break;
         default:
             handler_util_1.handleNotFound(req, res);
             break;
